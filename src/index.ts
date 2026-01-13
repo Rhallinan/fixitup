@@ -7,6 +7,7 @@ const client = new Client({
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildMembers, // Required for correct avatar fetching
     ],
 });
 
@@ -44,11 +45,17 @@ client.on(Events.MessageCreate, async (message: Message) => {
             });
         }
 
+        // Determine the best avatar URL
+        const avatarURL = message.member?.displayAvatarURL({ extension: 'png', size: 1024 })
+            || message.author.displayAvatarURL({ extension: 'png', size: 1024 });
+
+        console.log(`Replacing message from ${message.author.tag}. Using Avatar URL: ${avatarURL}`);
+
         // Send the new message using the webhook
         await webhook.send({
             content: newContent,
             username: message.member?.displayName || message.author.username,
-            avatarURL: message.member?.displayAvatarURL({ extension: 'png' }) || message.author.displayAvatarURL({ extension: 'png' }),
+            avatarURL: avatarURL,
             files: Array.from(message.attachments.values()), // Forward attachments if any
             allowedMentions: { parse: [] }, // Prevent mass pings
         });
