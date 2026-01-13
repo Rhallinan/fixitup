@@ -48,7 +48,7 @@ client.on(Events.MessageCreate, async (message: Message) => {
         await webhook.send({
             content: newContent,
             username: message.member?.displayName || message.author.username,
-            avatarURL: message.author.displayAvatarURL(),
+            avatarURL: message.member?.displayAvatarURL({ extension: 'png' }) || message.author.displayAvatarURL({ extension: 'png' }),
             files: Array.from(message.attachments.values()), // Forward attachments if any
             allowedMentions: { parse: [] }, // Prevent mass pings
         });
